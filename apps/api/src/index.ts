@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
+import authRoutes from "./routes/auth";
+import { seedAdmin } from "./seed";
 
 dotenv.config();
 
@@ -14,6 +17,15 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-app.listen(PORT, () => {
-  console.log(`API rodando em http://localhost:${PORT}`);
-});
+app.use("/auth", authRoutes);
+
+mongoose
+  .connect(process.env.MONGODB_URI as string)
+  .then(async () => {
+    console.log("MongoDB conectado!");
+    await seedAdmin();
+    app.listen(PORT, () => {
+      console.log(`API rodando em http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => console.error("Erro ao conectar MongoDB:", err));
