@@ -7,50 +7,22 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+import { useAuthStore } from "../../store/useAuthStore";
 
-const API_URL = "http://localhost:3001";
-
-export default function App() {
+export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [user, setUser] = useState<{ username: string; role: string } | null>(
-    null,
-  );
+
+  const { login, isLoading } = useAuthStore();
 
   async function handleLogin() {
-    setLoading(true);
     setError("");
     try {
-      const res = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error);
-        return;
-      }
-      setUser(data.user);
-    } catch {
-      setError("Não foi possível conectar à API");
-    } finally {
-      setLoading(false);
+      await login(username, password);
+    } catch (err: any) {
+      setError(err.message);
     }
-  }
-
-  if (user) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Bem-vindo, {user.username}!</Text>
-        <Text style={styles.subtitle}>Role: {user.role}</Text>
-        <TouchableOpacity style={styles.button} onPress={() => setUser(null)}>
-          <Text style={styles.buttonText}>Sair</Text>
-        </TouchableOpacity>
-      </View>
-    );
   }
 
   return (
@@ -77,9 +49,9 @@ export default function App() {
       <TouchableOpacity
         style={styles.button}
         onPress={handleLogin}
-        disabled={loading}
+        disabled={isLoading}
       >
-        {loading ? (
+        {isLoading ? (
           <ActivityIndicator color="#fff" />
         ) : (
           <Text style={styles.buttonText}>Entrar</Text>
@@ -98,7 +70,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   title: { fontSize: 28, fontWeight: "bold", marginBottom: 32 },
-  subtitle: { fontSize: 16, color: "#666", marginBottom: 24 },
   input: {
     width: "100%",
     borderWidth: 1,
