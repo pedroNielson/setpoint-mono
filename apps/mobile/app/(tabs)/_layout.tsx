@@ -1,10 +1,22 @@
-import { Redirect, Stack } from "expo-router";
-import { useAuthStore } from "../../store/useAuthStore";
+import { Drawer } from "expo-router/drawer";
 
-export default function AppLayout() {
-  const token = useAuthStore((s) => s.token);
-
-  if (!token) return <Redirect href="/(auth)/login" />;
-
-  return <Stack screenOptions={{ headerShown: false }} />;
+export default function Layout() {
+  return (
+    <Drawer>
+      <Drawer.Screen
+        name="index"
+        options={{
+          drawerLabel: "Home",
+          title: "overview",
+        }}
+      />
+      <Drawer.Screen
+        name="page_2"
+        options={{
+          drawerLabel: "Second Page",
+          title: "overview",
+        }}
+      />
+    </Drawer>
+  );
 }
