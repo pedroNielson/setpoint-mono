@@ -4,7 +4,7 @@ import { Stack } from "expo-router";
 import { useAuthStore } from "../store/useAuthStore";
 
 export default function RootLayout() {
-  const { hydrate, isHydrated } = useAuthStore();
+  const { token, isHydrated, hydrate } = useAuthStore();
 
   useEffect(() => {
     hydrate();
@@ -20,8 +20,13 @@ export default function RootLayout() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="(tabs)" />
+      <Stack.Protected guard={!token}>
+        <Stack.Screen name="login" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={!!token}>
+        <Stack.Screen name="(tabs)" />
+      </Stack.Protected>
     </Stack>
   );
 }

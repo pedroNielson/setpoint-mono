@@ -49,7 +49,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         return;
       }
 
-      // Token ainda válido — busca os dados do usuário
       const res = await fetch(`${API_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
