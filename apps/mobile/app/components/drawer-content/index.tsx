@@ -15,13 +15,13 @@ import {
 } from "../../../constants/colors";
 
 const NAV_ITEMS = [
-  { label: "Home", icon: Home, route: "/(app)/index" },
-  { label: "Eventos", icon: Calendar, route: "/(app)/eventos" },
+  { label: "Home", icon: Home, route: "/(tabs)/index" },
+  { label: "Eventos", icon: Calendar, route: "/(tabs)/page_2" },
 ];
 
 const FOOTER_ITEMS = [
-  { label: "Feedback", icon: MessageSquare, route: "/(app)/feedback" },
-  { label: "Ajuda", icon: HelpCircle, route: "/(app)/ajuda" },
+  { label: "Feedback", icon: MessageSquare, route: "/(tabs)/feedback" },
+  { label: "Ajuda", icon: HelpCircle, route: "/(tabs)/ajuda" },
 ];
 
 export function DrawerContent(props: DrawerContentComponentProps) {
