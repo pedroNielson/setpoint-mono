@@ -1,0 +1,6 @@
+{
+    "buildCommand": "cd apps/mobile && pnpm exec expo export --platform web",
+    "outputDirectory": "apps/mobile/dist",
+    "installCommand": "pnpm install",
+    "framework": null
+}
