@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useAuthStore } from "../../store/useAuthStore";
+import Loader from "../components/loader";
 
 export default function HomeScreen() {
   const { user, logout } = useAuthStore();
@@ -9,6 +10,8 @@ export default function HomeScreen() {
       <Text style={styles.title}>Home</Text>
       <Text style={styles.subtitle}>Bem-vindo, {user?.username}!</Text>
       <Text style={styles.role}>Role: {user?.role}</Text>
+
+      <Loader size={48} color="#000" />
 
       <TouchableOpacity style={styles.button} onPress={() => logout()}>
         <Text style={styles.buttonText}>Sair</Text>

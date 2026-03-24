@@ -1,0 +1,19 @@
+const ORANGE = "#FF5C00";
+const ORANGE_LIGHT = "#FF7A2E";
+const BLACK = "#0A0A0A";
+const GRAY_900 = "#111111";
+const GRAY_700 = "#2A2A2A";
+const GRAY_500 = "#666666";
+const GRAY_100 = "#F5F5F5";
+const WHITE = "#FFFFFF";
+
+export {
+  ORANGE,
+  ORANGE_LIGHT,
+  BLACK,
+  GRAY_900,
+  GRAY_700,
+  GRAY_500,
+  GRAY_100,
+  WHITE,
+};

@@ -20,14 +20,15 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { useAuthStore } from "../store/useAuthStore";
-
-const ORANGE = "#FF5C00";
-const ORANGE_LIGHT = "#FF7A2E";
-const BLACK = "#0A0A0A";
-const GRAY_900 = "#111111";
-const GRAY_700 = "#2A2A2A";
-const GRAY_500 = "#555555";
-const WHITE = "#FFFFFF";
+import {
+  GRAY_500,
+  GRAY_700,
+  GRAY_900,
+  ORANGE,
+  WHITE,
+  BLACK,
+  ORANGE_LIGHT,
+} from "../constants/colors";
 
 export default function LoginScreen() {
   const [username, setUsername] = useState("");

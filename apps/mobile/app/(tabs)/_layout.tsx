@@ -1,21 +1,30 @@
 import { Drawer } from "expo-router/drawer";
+import { SetpointTitle } from "../components/main-logo";
+import { DrawerContent } from "../components/drawer-content";
 
 export default function Layout() {
   return (
-    <Drawer>
+    <Drawer
+      drawerContent={(props) => <DrawerContent {...props} />}
+      screenOptions={{
+        headerTitle: () => <SetpointTitle />,
+        headerStyle: { backgroundColor: "#FFFFFF" },
+        headerShadowVisible: false,
+        drawerStyle: { width: 300 },
+      }}
+    >
+      <Drawer.Screen name="index" options={{ drawerLabel: "Home" }} />
+      <Drawer.Screen name="eventos" options={{ drawerLabel: "Eventos" }} />
       <Drawer.Screen
-        name="index"
+        name="feedback"
         options={{
-          drawerLabel: "Home",
-          title: "overview",
+          drawerLabel: "Feedback",
+          drawerItemStyle: { display: "none" },
         }}
       />
       <Drawer.Screen
-        name="page_2"
-        options={{
-          drawerLabel: "Second Page",
-          title: "overview",
-        }}
+        name="ajuda"
+        options={{ drawerLabel: "Ajuda", drawerItemStyle: { display: "none" } }}
       />
     </Drawer>
   );

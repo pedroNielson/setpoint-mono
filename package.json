@@ -9,5 +9,15 @@
     },
     "devDependencies": {
         "turbo": "latest"
+    },
+    "pnpm": {
+        "overrides": {
+            "react-native-worklets": "0.7.1"
+        },
+        "peerDependencyRules": {
+            "ignoreMissing": [
+                "react"
+            ]
+        }
     }
 }
