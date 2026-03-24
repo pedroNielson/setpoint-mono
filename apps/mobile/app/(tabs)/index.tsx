@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useAuthStore } from "../../store/useAuthStore";
 import Loader from "../components/loader";
+import { router } from "expo-router";
 
 export default function HomeScreen() {
   const { user, logout } = useAuthStore();
@@ -15,7 +16,10 @@ export default function HomeScreen() {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={async () => await logout()}
+        onPress={() => {
+          logout();
+          router.replace("/login");
+        }}
       >
         <Text style={styles.buttonText}>Sair</Text>
       </TouchableOpacity>

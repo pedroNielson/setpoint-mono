@@ -1,6 +1,6 @@
 import { Text, StyleSheet } from "react-native";
 
-export function SetpointTitle() {
+export default function SetpointTitle() {
   return <Text style={styles.title}>Setpoint</Text>;
 }
 

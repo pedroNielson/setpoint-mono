@@ -1,8 +1,20 @@
+import { useEffect } from "react";
 import { Drawer } from "expo-router/drawer";
-import { SetpointTitle } from "../components/main-logo";
-import { DrawerContent } from "../components/drawer-content";
+import { router } from "expo-router";
+import SetpointTitle from "../components/main-logo";
+import DrawerContent from "../components/drawer-content";
+import { useAuthStore } from "../../store/useAuthStore";
 
 export default function Layout() {
+  const token = useAuthStore((s) => s.token);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
+
+  useEffect(() => {
+    if (isHydrated && !token) {
+      router.replace("/login");
+    }
+  }, [token, isHydrated]);
+
   return (
     <Drawer
       drawerContent={(props) => <DrawerContent {...props} />}

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import {
   DrawerContentScrollView,
   DrawerContentComponentProps,
@@ -7,26 +7,36 @@ import { router, usePathname } from "expo-router";
 import { Home, Calendar, MessageSquare, HelpCircle } from "lucide-react-native";
 import { useAuthStore } from "../../../store/useAuthStore";
 import {
-  GRAY_100,
   GRAY_500,
   ORANGE,
   WHITE,
   BLACK,
+  GRAY_100,
 } from "../../../constants/colors";
 
 const NAV_ITEMS = [
-  { label: "Home", icon: Home, route: "/" },
-  { label: "Eventos", icon: Calendar, route: "/(tabs)/page_2" },
+  { label: "Home", icon: Home, route: "/", match: "/" },
+  {
+    label: "Eventos",
+    icon: Calendar,
+    route: "/page_2",
+    match: "/page_2",
+  },
 ];
 
 const FOOTER_ITEMS = [
-  { label: "Feedback", icon: MessageSquare, route: "/(tabs)/feedback" },
-  { label: "Ajuda", icon: HelpCircle, route: "/(tabs)/ajuda" },
+  { label: "Feedback", icon: MessageSquare, route: "/feedback" },
+  { label: "Ajuda", icon: HelpCircle, route: "/ajuda" },
 ];
 
-export function DrawerContent(props: DrawerContentComponentProps) {
+export default function DrawerContent(props: DrawerContentComponentProps) {
   const { user, logout } = useAuthStore();
   const pathname = usePathname();
+
+  function isActive(match: string) {
+    if (match === "/") return pathname === "/";
+    return pathname === match || pathname.startsWith(match);
+  }
 
   function navigate(route: string) {
     router.push(route as any);
@@ -40,7 +50,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header — avatar + nome + email */}
+        {/* Header */}
         <View style={styles.header}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
@@ -55,7 +65,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
           </View>
         </View>
 
-        {/* Search bar */}
+        {/* Search */}
         <TouchableOpacity style={styles.searchBar} activeOpacity={0.7}>
           <Text style={styles.searchText}>Eventos, times, arenas</Text>
           <View style={styles.searchIcon}>
@@ -65,10 +75,8 @@ export function DrawerContent(props: DrawerContentComponentProps) {
 
         {/* Nav items */}
         <View style={styles.navSection}>
-          {NAV_ITEMS.map(({ label, icon: Icon, route }) => {
-            const active =
-              pathname === route ||
-              pathname.startsWith(route.replace("/index", ""));
+          {NAV_ITEMS.map(({ label, icon: Icon, route, match }) => {
+            const active = isActive(match);
             return (
               <TouchableOpacity
                 key={route}
@@ -94,17 +102,26 @@ export function DrawerContent(props: DrawerContentComponentProps) {
 
       {/* Footer fixo */}
       <View style={styles.footer}>
-        {FOOTER_ITEMS.map(({ label, icon: Icon, route }) => (
-          <TouchableOpacity
-            key={route}
-            style={styles.navItem}
-            onPress={() => navigate(route)}
-            activeOpacity={0.7}
-          >
-            <Icon size={20} color={GRAY_500} strokeWidth={1.8} />
-            <Text style={styles.navLabel}>{label}</Text>
-          </TouchableOpacity>
-        ))}
+        {FOOTER_ITEMS.map(({ label, icon: Icon, route }) => {
+          const active = isActive(route);
+          return (
+            <TouchableOpacity
+              key={route}
+              style={[styles.navItem, active && styles.navItemActive]}
+              onPress={() => navigate(route)}
+              activeOpacity={0.7}
+            >
+              <Icon
+                size={20}
+                color={active ? ORANGE : GRAY_500}
+                strokeWidth={active ? 2.5 : 1.8}
+              />
+              <Text style={[styles.navLabel, active && styles.navLabelActive]}>
+                {label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
 
         {/* Upgrade block */}
         <View style={styles.upgradeBlock}>
@@ -129,8 +146,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 16,
   },
-
-  // Header
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -166,8 +181,6 @@ const styles = StyleSheet.create({
     color: GRAY_500,
     marginTop: 1,
   },
-
-  // Search
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -199,8 +212,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: GRAY_500,
   },
-
-  // Nav
   navSection: {
     paddingHorizontal: 10,
     gap: 2,
@@ -225,8 +236,6 @@ const styles = StyleSheet.create({
     color: ORANGE,
     fontWeight: "700",
   },
-
-  // Footer
   footer: {
     paddingHorizontal: 10,
     paddingBottom: 32,
@@ -235,8 +244,6 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     gap: 2,
   },
-
-  // Upgrade
   upgradeBlock: {
     marginTop: 16,
     marginHorizontal: 6,

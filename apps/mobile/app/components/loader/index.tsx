@@ -16,7 +16,7 @@ const Loader = ({ size, color }: { size?: number; color?: string }) => {
   React.useEffect(() => {
     const interval = setInterval(() => {
       setIconIndex((prev) => (prev + 1) % icons.length);
-    }, 300);
+    }, 260);
     return () => clearInterval(interval);
   }, [icons.length]);
 

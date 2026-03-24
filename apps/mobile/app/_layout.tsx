@@ -5,8 +5,9 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useFonts, FiraSans_700Bold } from "@expo-google-fonts/fira-sans";
 
 export default function RootLayout() {
-  const { token, isHydrated, hydrate } = useAuthStore();
-
+  const token = useAuthStore((s) => s.token);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
+  const hydrate = useAuthStore((s) => s.hydrate);
   const [fontsLoaded] = useFonts({ FiraSans_700Bold });
 
   useEffect(() => {

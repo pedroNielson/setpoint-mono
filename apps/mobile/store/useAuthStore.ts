@@ -1,10 +1,9 @@
 import { create } from "zustand";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 
-const API_URL = "http://localhost:3001";
-const TOKEN_KEY = "@setpoint:token";
-const TOKEN_TIMESTAMP_KEY = "@setpoint:token_timestamp";
+const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001";
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const STORAGE_KEY = "@setpoint:auth";
 
 interface User {
   username: string;
@@ -14,56 +13,74 @@ interface User {
 interface AuthState {
   token: string | null;
   user: User | null;
+  tokenTimestamp: number | null;
   isLoading: boolean;
   isHydrated: boolean;
   login: (username: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  hydrate: () => Promise<void>;
+  logout: () => void;
+  hydrate: () => void;
+}
+
+function saveToStorage(token: string, user: User, tokenTimestamp: number) {
+  if (Platform.OS !== "web") return;
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ token, user, tokenTimestamp }),
+    );
+  } catch {}
+}
+
+function clearStorage() {
+  if (Platform.OS !== "web") return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {}
+}
+
+function loadFromStorage(): {
+  token: string;
+  user: User;
+  tokenTimestamp: number;
+} | null {
+  if (Platform.OS !== "web") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   user: null,
+  tokenTimestamp: null,
   isLoading: false,
   isHydrated: false,
 
-  hydrate: async () => {
-    try {
-      const [tokenEntry, timestampEntry] = await AsyncStorage.multiGet([
-        TOKEN_KEY,
-        TOKEN_TIMESTAMP_KEY,
-      ]);
+  hydrate: () => {
+    const saved = loadFromStorage();
 
-      const token = tokenEntry[1];
-      const timestamp = timestampEntry[1];
-
-      if (!token || !timestamp) {
-        set({ isHydrated: true });
-        return;
-      }
-
-      const age = Date.now() - parseInt(timestamp, 10);
-      if (age > ONE_DAY_MS) {
-        await AsyncStorage.multiRemove([TOKEN_KEY, TOKEN_TIMESTAMP_KEY]);
-        set({ isHydrated: true });
-        return;
-      }
-
-      const res = await fetch(`${API_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) {
-        await AsyncStorage.multiRemove([TOKEN_KEY, TOKEN_TIMESTAMP_KEY]);
-        set({ isHydrated: true });
-        return;
-      }
-
-      const data = await res.json();
-      set({ token, user: data.user, isHydrated: true });
-    } catch {
+    if (!saved) {
       set({ isHydrated: true });
+      return;
     }
+
+    const expired = Date.now() - saved.tokenTimestamp > ONE_DAY_MS;
+    if (expired) {
+      clearStorage();
+      set({ isHydrated: true });
+      return;
+    }
+
+    set({
+      token: saved.token,
+      user: saved.user,
+      tokenTimestamp: saved.tokenTimestamp,
+      isHydrated: true,
+    });
   },
 
   login: async (username, password) => {
@@ -78,22 +95,23 @@ export const useAuthStore = create<AuthState>((set) => ({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erro ao fazer login");
 
-      await AsyncStorage.multiSet([
-        [TOKEN_KEY, data.token],
-        [TOKEN_TIMESTAMP_KEY, Date.now().toString()],
-      ]);
+      const tokenTimestamp = Date.now();
+      saveToStorage(data.token, data.user, tokenTimestamp);
 
-      set({ token: data.token, user: data.user, isLoading: false });
+      set({
+        token: data.token,
+        user: data.user,
+        tokenTimestamp,
+        isLoading: false,
+      });
     } catch (err) {
       set({ isLoading: false });
       throw err;
     }
   },
 
-  logout: async () => {
-    try {
-      await AsyncStorage.multiRemove([TOKEN_KEY, TOKEN_TIMESTAMP_KEY]);
-    } catch {}
-    set({ token: null, user: null });
+  logout: () => {
+    clearStorage();
+    set({ token: null, user: null, tokenTimestamp: null });
   },
 }));
