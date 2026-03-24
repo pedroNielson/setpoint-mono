@@ -15,7 +15,7 @@ import {
 } from "../../../constants/colors";
 
 const NAV_ITEMS = [
-  { label: "Home", icon: Home, route: "/(tabs)/index" },
+  { label: "Home", icon: Home, route: "/" },
   { label: "Eventos", icon: Calendar, route: "/(tabs)/page_2" },
 ];
 
