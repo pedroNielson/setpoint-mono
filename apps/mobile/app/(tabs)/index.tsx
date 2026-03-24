@@ -13,7 +13,10 @@ export default function HomeScreen() {
 
       <Loader size={48} color="#000" />
 
-      <TouchableOpacity style={styles.button} onPress={() => logout()}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={async () => await logout()}
+      >
         <Text style={styles.buttonText}>Sair</Text>
       </TouchableOpacity>
     </View>
