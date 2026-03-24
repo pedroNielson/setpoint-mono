@@ -91,7 +91,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
-    await AsyncStorage.multiRemove([TOKEN_KEY, TOKEN_TIMESTAMP_KEY]);
+    try {
+      await AsyncStorage.multiRemove([TOKEN_KEY, TOKEN_TIMESTAMP_KEY]);
+    } catch {}
     set({ token: null, user: null });
   },
 }));

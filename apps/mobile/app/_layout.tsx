@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { View, ActivityIndicator, Text, StyleSheet } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import { Stack } from "expo-router";
 import { useAuthStore } from "../store/useAuthStore";
 import { useFonts, FiraSans_700Bold } from "@expo-google-fonts/fira-sans";
@@ -7,9 +7,7 @@ import { useFonts, FiraSans_700Bold } from "@expo-google-fonts/fira-sans";
 export default function RootLayout() {
   const { token, isHydrated, hydrate } = useAuthStore();
 
-  const [fontsLoaded] = useFonts({
-    FiraSans_700Bold,
-  });
+  const [fontsLoaded] = useFonts({ FiraSans_700Bold });
 
   useEffect(() => {
     hydrate();
@@ -17,8 +15,15 @@ export default function RootLayout() {
 
   if (!isHydrated || !fontsLoaded) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#0A0A0A",
+        }}
+      >
+        <ActivityIndicator size="large" color="#FF5C00" />
       </View>
     );
   }
