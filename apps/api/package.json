@@ -4,7 +4,7 @@
     "scripts": {
         "dev": "bun --watch src/index.ts",
         "build": "bun build src/index.ts --outdir dist",
-        "start": "npx ts-node src/index.ts"
+        "start": "npx ts-node --compiler-options '{\"module\":\"commonjs\"}' src/index.ts"
     },
     "dependencies": {
         "bcryptjs": "^3.0.3",
