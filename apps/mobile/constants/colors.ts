@@ -1,5 +1,6 @@
 const ORANGE = "#FF5C00";
 const ORANGE_LIGHT = "#FF7A2E";
+const ORANGE_SUPER_LIGHT = "#FFF2EC";
 const BLACK = "#0A0A0A";
 const GRAY_900 = "#111111";
 const GRAY_700 = "#2A2A2A";
@@ -10,6 +11,7 @@ const WHITE = "#FFFFFF";
 export {
   ORANGE,
   ORANGE_LIGHT,
+  ORANGE_SUPER_LIGHT,
   BLACK,
   GRAY_900,
   GRAY_700,

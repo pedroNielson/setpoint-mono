@@ -19,8 +19,8 @@ const NAV_ITEMS = [
   {
     label: "Eventos",
     icon: Calendar,
-    route: "/page_2",
-    match: "/page_2",
+    route: "/events",
+    match: "/events",
   },
 ];
 
