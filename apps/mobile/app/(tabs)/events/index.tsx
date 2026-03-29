@@ -5,14 +5,18 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Modal,
+  Pressable,
+  Animated,
+  useWindowDimensions,
 } from "react-native";
 import { EventosHeader } from "../../components/events/header";
 import { FiltroBar, Filtro } from "../../components/events/filter";
 import { EventoGrid } from "../../components/events/grid";
 import { Evento } from "../../components/events/card";
 import { BLACK, ORANGE, GRAY_500 } from "../../../constants/colors";
-
-// ─── Dados mock — troca por fetch da API depois ──────────────────────────────
+import { useEffect, useRef } from "react";
+import { CreateEventDrawer } from "../../components/modals/create-event";
 
 const FILTROS: Filtro[] = [
   { id: "beach-tennis", label: "Beach Tennis", icone: "🎾" },
@@ -73,6 +77,7 @@ export default function EventosPage() {
   const [filtrosAtivos, setFiltrosAtivos] = useState<string[]>([
     "beach-tennis",
   ]);
+  const [drawerAberta, setDrawerAberta] = useState(false);
 
   function toggleFiltro(id: string) {
     setFiltrosAtivos((prev) =>
@@ -87,52 +92,64 @@ export default function EventosPage() {
   const eventosFiltrados = tab === "ativos" ? EVENTOS_MOCK : [];
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
-      <EventosHeader
-        arena="Arena"
-        titulo="Praia Beach"
-        onCriarEvento={() => console.log("criar evento")}
-      />
+    <>
+      <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+        <EventosHeader
+          arena="Arena"
+          titulo="Praia Beach"
+          onCriarEvento={() => setDrawerAberta(true)}
+        />
 
-      <View style={styles.tabs}>
-        <TouchableOpacity
-          style={[styles.tab, tab === "ativos" && styles.tabAtivo]}
-          onPress={() => setTab("ativos")}
-        >
-          <Text
-            style={[styles.tabLabel, tab === "ativos" && styles.tabLabelAtivo]}
+        <View style={styles.tabs}>
+          <TouchableOpacity
+            style={[styles.tab, tab === "ativos" && styles.tabAtivo]}
+            onPress={() => setTab("ativos")}
           >
-            Ativos
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[
+                styles.tabLabel,
+                tab === "ativos" && styles.tabLabelAtivo,
+              ]}
+            >
+              Ativos
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.tab, tab === "encerrados" && styles.tabAtivo]}
-          onPress={() => setTab("encerrados")}
-        >
-          <Text
-            style={[
-              styles.tabLabel,
-              tab === "encerrados" && styles.tabLabelAtivo,
-            ]}
+          <TouchableOpacity
+            style={[styles.tab, tab === "encerrados" && styles.tabAtivo]}
+            onPress={() => setTab("encerrados")}
           >
-            Encerrados
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <FiltroBar
-        filtros={FILTROS}
-        ativos={filtrosAtivos}
-        onToggle={toggleFiltro}
-        onRemove={removeFiltro}
+            <Text
+              style={[
+                styles.tabLabel,
+                tab === "encerrados" && styles.tabLabelAtivo,
+              ]}
+            >
+              Encerrados
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <FiltroBar
+          filtros={FILTROS}
+          ativos={filtrosAtivos}
+          onToggle={toggleFiltro}
+          onRemove={removeFiltro}
+        />
+
+        <EventoGrid
+          eventos={eventosFiltrados}
+          total={eventosFiltrados.length}
+          onEventoPress={(e) => console.log("abrir evento", e.id)}
+          onMenuPress={(e) => console.log("menu evento", e.id)}
+        />
+      </ScrollView>
+
+      <CreateEventDrawer
+        visible={drawerAberta}
+        onClose={() => setDrawerAberta(false)}
       />
-      <EventoGrid
-        eventos={eventosFiltrados}
-        total={eventosFiltrados.length}
-        onEventoPress={(e) => console.log("abrir evento", e.id)}
-        onMenuPress={(e) => console.log("menu evento", e.id)}
-      />
-    </ScrollView>
+    </>
   );
 }
 
@@ -169,5 +186,56 @@ const styles = StyleSheet.create({
   tabLabelAtivo: {
     color: BLACK,
     fontWeight: "700",
+  },
+
+  // Backdrop
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.35)",
+  },
+
+  // Drawer
+  drawer: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: -4, height: 0 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 20,
+  },
+  drawerHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EEEEEE",
+  },
+  drawerTitulo: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: BLACK,
+    letterSpacing: -0.3,
+  },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#EEEEEE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  closeX: {
+    fontSize: 14,
+    color: GRAY_500,
+  },
+  drawerContent: {
+    flex: 1,
   },
 });
