@@ -5,7 +5,7 @@ import {
 } from "@react-navigation/drawer";
 import { router, usePathname } from "expo-router";
 import { Home, Calendar, MessageSquare, HelpCircle } from "lucide-react-native";
-import { useAuthStore } from "../../../store/useAuthStore";
+import { useAuthStore } from "../../../services/useAuthStore";
 import {
   GRAY_500,
   ORANGE,

@@ -5,10 +5,12 @@ const BLACK = "#0A0A0A";
 const GRAY_900 = "#111111";
 const GRAY_700 = "#2A2A2A";
 const GRAY_500 = "#666666";
-const GRAY_400 = "#999999";
+const GRAY_400 = "#BBBBBB";
+const GRAY_600 = "#666666";
 const GRAY_100 = "#F5F5F5";
 const GRAY_200 = "#E5E5E5";
 const WHITE = "#FFFFFF";
+const GREEN = "#22C55E";
 
 export {
   ORANGE,
@@ -17,9 +19,11 @@ export {
   BLACK,
   GRAY_900,
   GRAY_700,
+  GRAY_600,
   GRAY_500,
   GRAY_400,
   GRAY_200,
   GRAY_100,
   WHITE,
+  GREEN,
 };

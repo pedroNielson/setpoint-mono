@@ -10,3 +10,21 @@ type Categoria = {
 type TipoCategoria = "masculino" | "feminino" | "mista";
 
 export type { Categoria, TipoCategoria };
+
+export type EventForm = {
+  name: string;
+  description: string;
+  type: string;
+  date: string;
+  hour: string;
+  progress?: number;
+  duration?: number;
+  categories: Categoria[];
+};
+
+export type Evento = EventForm & {
+  _id: string;
+  owner: string;
+  createdAt: string;
+  updatedAt: string;
+};

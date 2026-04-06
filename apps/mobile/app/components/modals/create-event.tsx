@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -16,10 +16,12 @@ import AreaInsert from "../forms/area-insert";
 import BasicDate from "../forms/basic-date";
 import BasicTime from "../forms/basic-time";
 import { CategoriasSelector } from "../forms/category-insert";
-import { Categoria } from "../../../constants/types";
+import { Categoria, EventForm } from "../../../constants/types";
 import BasicButton from "../forms/button";
 import BasicSelect from "../forms/basic-select";
 import FormResult from "../events/result";
+import { api } from "../../../services/api";
+import { useAuthStore } from "../../../services/useAuthStore";
 
 interface Props {
   visible: boolean;
@@ -30,26 +32,18 @@ const DRAWER_WIDTH = 480;
 const DURATION_IN = 320;
 const DURATION_OUT = 240;
 
-type EventForm = {
-  nome: string;
-  descricao: string;
-  modalidade: string;
-  data: string;
-  hora: string;
-  categorias: Categoria[];
-};
-
 export function CreateEventDrawer({ visible, onClose }: Props) {
+  const { token } = useAuthStore();
   const [modalVisible, setModalVisible] = useState(false);
   const [step, setStep] = useState<"form" | "review">("form");
 
   const [form, setForm] = useState<EventForm>({
-    nome: "",
-    descricao: "",
-    modalidade: "",
-    data: "",
-    hora: "",
-    categorias: [],
+    name: "",
+    description: "",
+    type: "",
+    date: "",
+    hour: "",
+    categories: [],
   });
 
   const translateX = useRef(new Animated.Value(DRAWER_WIDTH)).current;
@@ -96,7 +90,7 @@ export function CreateEventDrawer({ visible, onClose }: Props) {
   }, [visible]);
 
   function handleSave() {
-    if (!form.nome || !form.data || !form.hora) {
+    if (!form.name || !form.date || !form.hour) {
       alert("Preencha nome, data e hora");
       return;
     }
@@ -104,23 +98,23 @@ export function CreateEventDrawer({ visible, onClose }: Props) {
     setStep("review");
   }
 
-  function handleCreateEvent() {
+  async function handleCreateEvent() {
     console.log("Evento criado:", form);
 
-    // 👉 aqui entra API / backend futuramente
-
-    resetForm();
+    const novo = await api.events.create(token, form);
+    console.log("Resposta da API:", novo);
+    // resetForm();
     onClose();
   }
 
   function resetForm() {
     setForm({
-      nome: "",
-      descricao: "",
-      modalidade: "",
-      data: "",
-      hora: "",
-      categorias: [],
+      name: "",
+      description: "",
+      type: "",
+      date: "",
+      hour: "",
+      categories: [],
     });
     setStep("form");
   }
@@ -160,28 +154,28 @@ export function CreateEventDrawer({ visible, onClose }: Props) {
               <BasicInsert
                 title="Nome"
                 placeholder="Insira o nome do evento"
-                value={form.nome}
-                onChange={(v) => setForm((prev) => ({ ...prev, nome: v }))}
+                value={form.name}
+                onChange={(v) => setForm((prev) => ({ ...prev, name: v }))}
               />
 
               <AreaInsert
                 title="Descrição"
                 placeholder="Insira a descrição do evento"
-                value={form.descricao}
-                onChange={(v) => setForm((prev) => ({ ...prev, descricao: v }))}
+                value={form.description}
+                onChange={(v) =>
+                  setForm((prev) => ({ ...prev, description: v }))
+                }
               />
 
               <BasicSelect
                 title="Modalidade"
-                value={form.modalidade}
+                value={form.type}
                 options={[
                   { label: "Beach Tenis", value: "beach-tenis" },
                   { label: "Futevolei", value: "futevolei" },
                   { label: "Volei de areia", value: "volei-de-areia" },
                 ]}
-                onChange={(v) =>
-                  setForm((prev) => ({ ...prev, modalidade: v }))
-                }
+                onChange={(v) => setForm((prev) => ({ ...prev, type: v }))}
               />
 
               <Text style={{ marginLeft: 10, fontWeight: "bold" }}>Data</Text>
@@ -189,22 +183,22 @@ export function CreateEventDrawer({ visible, onClose }: Props) {
               <View style={{ flexDirection: "row" }}>
                 <BasicDate
                   format="complete"
-                  value={form.data}
-                  onChange={(v) => setForm((prev) => ({ ...prev, data: v }))}
+                  value={form.date}
+                  onChange={(v) => setForm((prev) => ({ ...prev, date: v }))}
                   flex={7}
                 />
 
                 <BasicTime
-                  value={form.hora}
-                  onChange={(v) => setForm((prev) => ({ ...prev, hora: v }))}
+                  value={form.hour}
+                  onChange={(v) => setForm((prev) => ({ ...prev, hour: v }))}
                   flex={3}
                 />
               </View>
 
               <CategoriasSelector
-                value={form.categorias}
+                value={form.categories}
                 onChange={(cats) =>
-                  setForm((prev) => ({ ...prev, categorias: cats }))
+                  setForm((prev) => ({ ...prev, categories: cats }))
                 }
               />
 

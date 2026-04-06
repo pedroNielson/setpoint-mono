@@ -3,7 +3,7 @@ import { Drawer } from "expo-router/drawer";
 import { router } from "expo-router";
 import SetpointTitle from "../components/main-logo";
 import DrawerContent from "../components/drawer-content";
-import { useAuthStore } from "../../store/useAuthStore";
+import { useAuthStore } from "../../services/useAuthStore";
 
 export default function Layout() {
   const token = useAuthStore((s) => s.token);

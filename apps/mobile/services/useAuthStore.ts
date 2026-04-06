@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { Platform } from "react-native";
+import { api } from "./api";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001";
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const STORAGE_KEY = "@setpoint:auth";
 
@@ -86,24 +86,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (username, password) => {
     set({ isLoading: true });
     try {
-      const res = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erro ao fazer login");
+      const { token, user } = await api.auth.login(username, password);
 
       const tokenTimestamp = Date.now();
-      saveToStorage(data.token, data.user, tokenTimestamp);
+      saveToStorage(token, user, tokenTimestamp);
 
-      set({
-        token: data.token,
-        user: data.user,
-        tokenTimestamp,
-        isLoading: false,
-      });
+      set({ token, user, tokenTimestamp, isLoading: false });
     } catch (err) {
       set({ isLoading: false });
       throw err;

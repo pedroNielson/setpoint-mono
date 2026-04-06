@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { Stack } from "expo-router";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../services/useAuthStore";
 import { useFonts, FiraSans_700Bold } from "@expo-google-fonts/fira-sans";
 
 export default function RootLayout() {
