@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useAuthStore } from "../../store/useAuthStore";
+import { useAuthStore } from "../../services/useAuthStore";
 import Loader from "../components/loader";
 import { router } from "expo-router";
 

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth";
 import { seedAdmin } from "./seed";
+import eventRoutes from "./routes/events";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/events", eventRoutes);
 
 mongoose
   .connect(process.env.MONGODB_URI as string)

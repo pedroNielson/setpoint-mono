@@ -6,8 +6,10 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useState } from "react";
-import { EventoCard, Evento } from "./card";
+import { EventoCard } from "./card";
 import { LayoutGrid, Rows3 } from "lucide-react-native";
+import { Evento } from "../../../constants/types";
+import { BLACK, GRAY_500, ORANGE } from "../../../constants/colors";
 
 interface Props {
   eventos: Evento[];
@@ -16,10 +18,6 @@ interface Props {
   onMenuPress?: (evento: Evento) => void;
 }
 
-const ORANGE = "#FF5C00";
-const ORANGE_BG = "#FFF2EC";
-const GRAY_500 = "#888888";
-const BLACK = "#111111";
 const GAP = 16;
 const MIN_CARD = 255;
 const MAX_CARD = 300;
@@ -81,7 +79,7 @@ export function EventoGrid({
       {layout === "grid" ? (
         <View style={styles.grid}>
           {eventos.map((evento) => (
-            <View key={evento.id} style={{ width: cardWidth }}>
+            <View key={evento._id} style={{ width: cardWidth }}>
               <EventoCard
                 evento={evento}
                 onPress={() => onEventoPress?.(evento)}
@@ -93,7 +91,7 @@ export function EventoGrid({
       ) : (
         <View style={styles.list}>
           {eventos.map((evento) => (
-            <View key={evento.id} style={styles.listItem}>
+            <View key={evento._id} style={styles.listItem}>
               <EventoCard
                 evento={evento}
                 onPress={() => onEventoPress?.(evento)}
@@ -139,7 +137,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   toggleBtnAtivo: {
-    backgroundColor: ORANGE_BG,
     borderColor: ORANGE,
   },
   grid: {

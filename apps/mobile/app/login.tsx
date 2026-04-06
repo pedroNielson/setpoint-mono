@@ -19,7 +19,7 @@ import Animated, {
   withSpring,
   Easing,
 } from "react-native-reanimated";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../services/useAuthStore";
 import {
   GRAY_500,
   GRAY_700,

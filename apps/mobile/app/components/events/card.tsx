@@ -1,12 +1,12 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-
-export interface Evento {
-  id: string;
-  titulo: string;
-  status: "Confirmados" | "Encerrado" | "Pendente";
-  progresso: number; // 0 a 1
-  imagemUrl?: string;
-}
+import { Evento } from "../../../constants/types";
+import {
+  BLACK,
+  GRAY_400,
+  GRAY_600,
+  GREEN,
+  WHITE,
+} from "../../../constants/colors";
 
 interface Props {
   evento: Evento;
@@ -15,13 +15,17 @@ interface Props {
 }
 
 const GRAY_100 = "#F5F5F5";
-const GRAY_400 = "#BBBBBB";
-const GRAY_600 = "#666666";
-const GREEN = "#22C55E";
-const WHITE = "#FFFFFF";
-const BLACK = "#111111";
+
+const MODALIDADE_LABEL: Record<string, string> = {
+  "beach-tenis": "Beach Tênis",
+  futevolei: "Futevolei",
+  "volei-de-areia": "Vôlei de Areia",
+};
 
 export function EventoCard({ evento, onPress, onMenuPress }: Props) {
+  const progresso = evento.progress ?? 0;
+  const label = MODALIDADE_LABEL[evento.type] ?? evento.type;
+
   return (
     <TouchableOpacity
       style={styles.card}
@@ -30,15 +34,7 @@ export function EventoCard({ evento, onPress, onMenuPress }: Props) {
     >
       {/* Imagem */}
       <View style={styles.imageContainer}>
-        {evento.imagemUrl ? (
-          <Image
-            source={{ uri: evento.imagemUrl }}
-            style={styles.image}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={styles.imagePlaceholder} />
-        )}
+        <View style={styles.imagePlaceholder} />
 
         {/* Menu */}
         <TouchableOpacity
@@ -53,21 +49,19 @@ export function EventoCard({ evento, onPress, onMenuPress }: Props) {
       {/* Conteúdo */}
       <View style={styles.content}>
         <Text style={styles.titulo} numberOfLines={1}>
-          {evento.titulo}
+          {evento.name}
         </Text>
 
-        {/* Status */}
         <View style={styles.statusRow}>
           <View style={styles.statusIcon} />
-          <Text style={styles.statusText}>{evento.status}</Text>
+          <Text style={styles.statusText}>{label}</Text>
         </View>
 
-        {/* Barra de progresso */}
         <View style={styles.progressTrack}>
           <View
             style={[
               styles.progressFill,
-              { width: `${evento.progresso * 100}%` },
+              { width: `${progresso * 100}%` as any },
             ]}
           />
         </View>
@@ -88,10 +82,6 @@ const styles = StyleSheet.create({
     position: "relative",
     height: 140,
     backgroundColor: GRAY_100,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
   },
   imagePlaceholder: {
     flex: 1,

@@ -1,83 +1,56 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Modal,
-  Pressable,
-  Animated,
-  useWindowDimensions,
 } from "react-native";
 import { EventosHeader } from "../../components/events/header";
 import { FiltroBar, Filtro } from "../../components/events/filter";
 import { EventoGrid } from "../../components/events/grid";
-import { Evento } from "../../components/events/card";
 import { BLACK, ORANGE, GRAY_500 } from "../../../constants/colors";
-import { useEffect, useRef } from "react";
 import { CreateEventDrawer } from "../../components/modals/create-event";
+import { useAuthStore } from "../../../services/useAuthStore";
+import { api } from "../../../services/api";
+import { Evento } from "../../../constants/types";
+import Loader from "../../components/loader";
 
 const FILTROS: Filtro[] = [
-  { id: "beach-tennis", label: "Beach Tennis", icone: "🎾" },
-  { id: "futvolei", label: "Futvolei", icone: "⚽" },
-  { id: "volei", label: "Volei", icone: "🏐" },
-  { id: "corrida", label: "Corrida", icone: "🏃" },
-];
-
-const EVENTOS_MOCK: Evento[] = [
-  {
-    id: "1",
-    titulo: "Campeonato 4 Estações",
-    status: "Confirmados",
-    progresso: 0.4,
-  },
-  {
-    id: "2",
-    titulo: "Campeonato DropShot",
-    status: "Confirmados",
-    progresso: 0.6,
-  },
-  {
-    id: "3",
-    titulo: "Campeonato Gohan",
-    status: "Confirmados",
-    progresso: 0.3,
-  },
-  {
-    id: "4",
-    titulo: "Campeonato Arena 77",
-    status: "Confirmados",
-    progresso: 0.15,
-  },
-  {
-    id: "5",
-    titulo: "Campeonato Circuito Fogo",
-    status: "Confirmados",
-    progresso: 0.08,
-  },
-  {
-    id: "6",
-    titulo: "Campeonato Circuito Agua",
-    status: "Confirmados",
-    progresso: 0.5,
-  },
-  {
-    id: "7",
-    titulo: "Campeonato Pé na Areia",
-    status: "Confirmados",
-    progresso: 0.2,
-  },
+  { id: "beach-tenis", label: "Beach Tennis", icone: "🎾" },
+  { id: "futevolei", label: "Futvolei", icone: "⚽" },
+  { id: "volei-de-areia", label: "Volei", icone: "🏐" },
 ];
 
 type Tab = "ativos" | "encerrados";
 
 export default function EventosPage() {
+  const { token } = useAuthStore();
+
   const [tab, setTab] = useState<Tab>("ativos");
-  const [filtrosAtivos, setFiltrosAtivos] = useState<string[]>([
-    "beach-tennis",
-  ]);
+  const [filtrosAtivos, setFiltrosAtivos] = useState<string[]>([]);
   const [drawerAberta, setDrawerAberta] = useState(false);
+  const [eventos, setEventos] = useState<Evento[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchEventos = useCallback(async () => {
+    if (!token) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await api.events.getAll(token);
+      setEventos(data);
+    } catch (err: any) {
+      setError(err.message ?? "Erro ao buscar eventos");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchEventos();
+  }, [fetchEventos]);
 
   function toggleFiltro(id: string) {
     setFiltrosAtivos((prev) =>
@@ -89,7 +62,54 @@ export default function EventosPage() {
     setFiltrosAtivos((prev) => prev.filter((f) => f !== id));
   }
 
-  const eventosFiltrados = tab === "ativos" ? EVENTOS_MOCK : [];
+  const eventosFiltrados = eventos.filter((e) => {
+    if (filtrosAtivos.length > 0 && !filtrosAtivos.includes(e.type))
+      return false;
+    return tab === "ativos";
+  });
+
+  function handleEventoCriado() {
+    setDrawerAberta(false);
+    fetchEventos();
+  }
+
+  function renderGrid() {
+    if (isLoading) {
+      return (
+        <View style={styles.gridLoader}>
+          <Loader size={32} color={ORANGE} />
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <View style={styles.gridEmpty}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={fetchEventos}>
+            <Text style={styles.retryText}>Tentar novamente</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    if (eventosFiltrados.length === 0) {
+      return (
+        <View style={styles.gridEmpty}>
+          <Text style={styles.emptyText}>Nenhum evento encontrado</Text>
+        </View>
+      );
+    }
+
+    return (
+      <EventoGrid
+        eventos={eventosFiltrados}
+        total={eventosFiltrados.length}
+        onEventoPress={(e) => console.log("abrir evento", e._id)}
+        onMenuPress={(e) => console.log("menu evento", e._id)}
+      />
+    );
+  }
 
   return (
     <>
@@ -101,33 +121,19 @@ export default function EventosPage() {
         />
 
         <View style={styles.tabs}>
-          <TouchableOpacity
-            style={[styles.tab, tab === "ativos" && styles.tabAtivo]}
-            onPress={() => setTab("ativos")}
-          >
-            <Text
-              style={[
-                styles.tabLabel,
-                tab === "ativos" && styles.tabLabelAtivo,
-              ]}
+          {(["ativos", "encerrados"] as Tab[]).map((t) => (
+            <TouchableOpacity
+              key={t}
+              style={[styles.tab, tab === t && styles.tabAtivo]}
+              onPress={() => setTab(t)}
             >
-              Ativos
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tab, tab === "encerrados" && styles.tabAtivo]}
-            onPress={() => setTab("encerrados")}
-          >
-            <Text
-              style={[
-                styles.tabLabel,
-                tab === "encerrados" && styles.tabLabelAtivo,
-              ]}
-            >
-              Encerrados
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[styles.tabLabel, tab === t && styles.tabLabelAtivo]}
+              >
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         <FiltroBar
@@ -137,18 +143,10 @@ export default function EventosPage() {
           onRemove={removeFiltro}
         />
 
-        <EventoGrid
-          eventos={eventosFiltrados}
-          total={eventosFiltrados.length}
-          onEventoPress={(e) => console.log("abrir evento", e.id)}
-          onMenuPress={(e) => console.log("menu evento", e.id)}
-        />
+        {renderGrid()}
       </ScrollView>
 
-      <CreateEventDrawer
-        visible={drawerAberta}
-        onClose={() => setDrawerAberta(false)}
-      />
+      <CreateEventDrawer visible={drawerAberta} onClose={handleEventoCriado} />
     </>
   );
 }
@@ -187,55 +185,36 @@ const styles = StyleSheet.create({
     color: BLACK,
     fontWeight: "700",
   },
-
-  // Backdrop
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.35)",
-  },
-
-  // Drawer
-  drawer: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: { width: -4, height: 0 },
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
-    elevation: 20,
-  },
-  drawerHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#EEEEEE",
-  },
-  drawerTitulo: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: BLACK,
-    letterSpacing: -0.3,
-  },
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#EEEEEE",
+  gridLoader: {
+    paddingVertical: 60,
     alignItems: "center",
     justifyContent: "center",
   },
-  closeX: {
+  gridEmpty: {
+    paddingVertical: 60,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+  },
+  errorText: {
+    fontSize: 14,
+    color: "#E24B4A",
+    textAlign: "center",
+  },
+  retryBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: ORANGE,
+  },
+  retryText: {
+    fontSize: 13,
+    color: ORANGE,
+    fontWeight: "600",
+  },
+  emptyText: {
     fontSize: 14,
     color: GRAY_500,
-  },
-  drawerContent: {
-    flex: 1,
   },
 });
