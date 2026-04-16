@@ -20,6 +20,7 @@ export type EventForm = {
   progress?: number;
   duration?: number;
   categories: Categoria[];
+  status?: "scheduled" | "pending" | "completed" | "cancelled";
 };
 
 export type Evento = EventForm & {
