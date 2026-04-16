@@ -15,6 +15,7 @@ import { useAuthStore } from "../../../services/useAuthStore";
 import { api } from "../../../services/api";
 import { Evento } from "../../../constants/types";
 import Loader from "../../components/loader";
+import { router } from "expo-router";
 
 const FILTROS: Filtro[] = [
   { id: "beach-tenis", label: "Beach Tennis", icone: "🎾" },
@@ -105,7 +106,7 @@ export default function EventosPage() {
       <EventoGrid
         eventos={eventosFiltrados}
         total={eventosFiltrados.length}
-        onEventoPress={(e) => console.log("abrir evento", e._id)}
+        onEventoPress={(e) => router.push(`/events/${e._id}`)}
         onMenuPress={(e) => console.log("menu evento", e._id)}
       />
     );

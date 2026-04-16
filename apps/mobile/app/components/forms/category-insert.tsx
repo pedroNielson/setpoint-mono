@@ -245,7 +245,7 @@ function NumericInput({
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 0,
   },
   sectionTitle: {
     color: BLACK,

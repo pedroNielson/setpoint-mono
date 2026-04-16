@@ -1,4 +1,4 @@
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,15 +8,23 @@ import {
   Pressable,
   Animated,
   Easing,
+  ScrollView,
 } from "react-native";
-import { BLACK, GRAY_400, GRAY_500, ORANGE } from "../../../constants/colors";
+import {
+  BLACK,
+  GRAY_100,
+  GRAY_400,
+  GRAY_500,
+  GRAY_700,
+  ORANGE,
+} from "../../../constants/colors";
 import { X } from "lucide-react-native";
 import BasicInsert from "../forms/basic-insert";
 import AreaInsert from "../forms/area-insert";
 import BasicDate from "../forms/basic-date";
 import BasicTime from "../forms/basic-time";
 import { CategoriasSelector } from "../forms/category-insert";
-import { Categoria, EventForm } from "../../../constants/types";
+import { EventForm } from "../../../constants/types";
 import BasicButton from "../forms/button";
 import BasicSelect from "../forms/basic-select";
 import FormResult from "../events/result";
@@ -94,16 +102,12 @@ export function CreateEventDrawer({ visible, onClose }: Props) {
       alert("Preencha nome, data e hora");
       return;
     }
-
     setStep("review");
   }
 
   async function handleCreateEvent() {
-    console.log("Evento criado:", form);
-
     const novo = await api.events.create(token, form);
     console.log("Resposta da API:", novo);
-    // resetForm();
     onClose();
   }
 
@@ -137,18 +141,29 @@ export function CreateEventDrawer({ visible, onClose }: Props) {
             {step === "form" ? "Criar evento" : "Revisar evento"}
           </Text>
 
-          <TouchableOpacity
-            style={styles.closeBtn}
+          <Pressable
+            style={({ hovered }: any) => [
+              styles.closeBtn,
+              {
+                backgroundColor: hovered ? GRAY_100 : "transparent",
+                borderColor: hovered ? GRAY_700 : "#EEEEEE",
+              },
+            ]}
             onPress={() => {
               resetForm();
               onClose();
             }}
           >
             <X size={14} color={GRAY_500} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
-        <View style={styles.content}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           {step === "form" ? (
             <>
               <BasicInsert
@@ -178,16 +193,15 @@ export function CreateEventDrawer({ visible, onClose }: Props) {
                 onChange={(v) => setForm((prev) => ({ ...prev, type: v }))}
               />
 
-              <Text style={{ marginLeft: 10, fontWeight: "bold" }}>Data</Text>
+              <Text style={styles.dateLabel}>Data</Text>
 
-              <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row", gap: 8, marginTop: -14 }}>
                 <BasicDate
                   format="complete"
                   value={form.date}
                   onChange={(v) => setForm((prev) => ({ ...prev, date: v }))}
                   flex={7}
                 />
-
                 <BasicTime
                   value={form.hour}
                   onChange={(v) => setForm((prev) => ({ ...prev, hour: v }))}
@@ -201,38 +215,34 @@ export function CreateEventDrawer({ visible, onClose }: Props) {
                   setForm((prev) => ({ ...prev, categories: cats }))
                 }
               />
-
-              <View style={{ marginTop: "auto" }}>
-                <BasicButton
-                  title="Salvar"
-                  color={ORANGE}
-                  onPress={handleSave}
-                  style={styles.saveButton}
-                />
-              </View>
             </>
           ) : (
-            <>
-              <FormResult form={form} />
-
-              <View
-                style={{ marginTop: "auto", flexDirection: "row", gap: 10 }}
-              >
-                <BasicButton
-                  title="Voltar"
-                  color={GRAY_400}
-                  onPress={() => setStep("form")}
-                  style={[styles.cancelButton, { flex: 0.3 }]}
-                />
-
-                <BasicButton
-                  title="Criar evento"
-                  color={ORANGE}
-                  onPress={handleCreateEvent}
-                  style={[styles.saveButton, { flex: 0.7 }]}
-                />
-              </View>
-            </>
+            <FormResult form={form} />
+          )}
+        </ScrollView>
+        <View style={styles.footer}>
+          {step === "form" ? (
+            <BasicButton
+              title="Salvar"
+              color={ORANGE}
+              onPress={handleSave}
+              style={styles.saveButton}
+            />
+          ) : (
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <BasicButton
+                title="Voltar"
+                color={GRAY_400}
+                onPress={() => setStep("form")}
+                style={[styles.cancelButton, { flex: 0.3 }]}
+              />
+              <BasicButton
+                title="Criar evento"
+                color={ORANGE}
+                onPress={handleCreateEvent}
+                style={[styles.saveButton, { flex: 0.7 }]}
+              />
+            </View>
           )}
         </View>
       </Animated.View>
@@ -242,10 +252,9 @@ export function CreateEventDrawer({ visible, onClose }: Props) {
 
 const styles = StyleSheet.create({
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "rgba(0,0,0,0.35)",
   },
-
   drawer: {
     position: "absolute",
     top: 0,
@@ -258,70 +267,58 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 24,
     elevation: 20,
+    flexDirection: "column",
   },
-
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 18,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: "#EEEEEE",
   },
-
   titulo: {
     fontSize: 18,
     fontWeight: "700",
     color: BLACK,
     letterSpacing: -0.3,
   },
-
   closeBtn: {
     width: 32,
     height: 32,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#EEEEEE",
     alignItems: "center",
     justifyContent: "center",
   },
-
-  content: {
+  scroll: {
     flex: 1,
+  },
+  scrollContent: {
     padding: 16,
     gap: 20,
   },
-
+  footer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#EEEEEE",
+    backgroundColor: "#fff",
+  },
+  dateLabel: {
+    fontWeight: "bold",
+    color: BLACK,
+  },
   saveButton: {
-    marginTop: 5,
     backgroundColor: ORANGE,
     borderRadius: 10,
     alignItems: "center",
     paddingVertical: 5,
   },
   cancelButton: {
-    marginTop: 5,
     backgroundColor: GRAY_400,
     borderRadius: 10,
     alignItems: "center",
     paddingVertical: 5,
-  },
-
-  // 🔥 REVIEW SCREEN
-
-  reviewBox: {
-    backgroundColor: "#FAFAFA",
-    borderRadius: 12,
-    padding: 16,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: "#EEEEEE",
-  },
-
-  reviewItem: {
-    fontSize: 14,
-    color: BLACK,
-    lineHeight: 20,
   },
 });

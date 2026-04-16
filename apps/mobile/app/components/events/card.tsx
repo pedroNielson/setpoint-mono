@@ -7,6 +7,8 @@ import {
   GREEN,
   WHITE,
 } from "../../../constants/colors";
+import BeachImage from "../../../constants/images";
+import { Ellipsis } from "lucide-react-native";
 
 interface Props {
   evento: Evento;
@@ -32,21 +34,17 @@ export function EventoCard({ evento, onPress, onMenuPress }: Props) {
       onPress={onPress}
       activeOpacity={0.85}
     >
-      {/* Imagem */}
       <View style={styles.imageContainer}>
-        <View style={styles.imagePlaceholder} />
-
-        {/* Menu */}
+        <BeachImage width="100%" height={140} />
         <TouchableOpacity
           style={styles.menuButton}
           onPress={onMenuPress}
           activeOpacity={0.7}
         >
-          <Text style={styles.menuDots}>•••</Text>
+          <Ellipsis size={16} color={GRAY_600} />
         </TouchableOpacity>
       </View>
 
-      {/* Conteúdo */}
       <View style={styles.content}>
         <Text style={styles.titulo} numberOfLines={1}>
           {evento.name}
@@ -79,13 +77,7 @@ const styles = StyleSheet.create({
     borderColor: "#EEEEEE",
   },
   imageContainer: {
-    position: "relative",
     height: 140,
-    backgroundColor: GRAY_100,
-  },
-  imagePlaceholder: {
-    flex: 1,
-    backgroundColor: GRAY_100,
   },
   menuButton: {
     position: "absolute",
