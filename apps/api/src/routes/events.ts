@@ -48,6 +48,7 @@ router.post("/", async (req: AuthRequest, res: Response) => {
       categories,
       duration,
       progress,
+      status,
     } = req.body;
 
     if (!name || !type || !date || !hour) {
@@ -67,6 +68,7 @@ router.post("/", async (req: AuthRequest, res: Response) => {
       duration: duration ?? 0,
       progress: progress ?? 0,
       owner: req.user!.id,
+      status: status ?? "pending",
     });
 
     res.status(201).json({ data: event });

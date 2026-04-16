@@ -28,6 +28,11 @@ const EventSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    status: {
+      type: String,
+      enum: ["scheduled", "pending", "completed", "cancelled"],
+      default: "pending",
+    },
   },
   { timestamps: true },
 );
