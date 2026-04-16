@@ -165,13 +165,12 @@ const BasicSelect = ({
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingHorizontal: 10,
     zIndex: 99,
   },
   title: {
     fontSize: 12,
     fontWeight: "700",
-    color: GRAY_500,
+    color: BLACK,
     letterSpacing: 0.5,
     textTransform: "uppercase",
     marginBottom: 8,

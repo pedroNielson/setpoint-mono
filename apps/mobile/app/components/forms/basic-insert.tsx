@@ -15,7 +15,7 @@ const BasicInsert = ({
   onChange,
 }: BasicInsertProps) => {
   return (
-    <View style={{ paddingHorizontal: 10 }}>
+    <View>
       <Text style={{ fontWeight: "bold", marginBottom: 8 }}>{title}</Text>
       <TextInput
         placeholder={placeholder || "Insira o valor"}

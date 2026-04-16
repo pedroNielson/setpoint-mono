@@ -74,7 +74,7 @@ const BasicTime = ({
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 0,
   },
   title: {
     fontWeight: "700",
