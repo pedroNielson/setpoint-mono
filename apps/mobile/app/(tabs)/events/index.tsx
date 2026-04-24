@@ -106,7 +106,23 @@ export default function EventosPage() {
       <EventoGrid
         eventos={eventosFiltrados}
         total={eventosFiltrados.length}
-        onEventoPress={(e) => router.push(`/events/${e._id}`)}
+        onEventoPress={(e) =>
+          router.push({
+            pathname: `/events/${e._id}`,
+            params: {
+              name: e.name,
+              description: e.description,
+              type: e.type,
+              date: e.date,
+              hour: e.hour,
+              progress: e.progress,
+              duration: e.duration,
+              categories: e.categories,
+              owner: e.owner,
+              status: e.status,
+            },
+          })
+        }
         onMenuPress={(e) => console.log("menu evento", e._id)}
       />
     );

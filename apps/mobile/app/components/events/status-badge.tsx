@@ -3,9 +3,11 @@ import { getStatusConfig } from "../../../constants/event-status";
 
 interface Props {
   status: string;
+  style?: object;
+  textStyle?: object;
 }
 
-export function StatusBadge({ status }: Props) {
+export function StatusBadge({ status, style, textStyle }: Props) {
   const config = getStatusConfig(status);
 
   return (
@@ -16,10 +18,11 @@ export function StatusBadge({ status }: Props) {
           backgroundColor: config.backgroundColor,
           borderColor: config.borderColor,
         },
+        style,
       ]}
     >
       <View style={[styles.dot, { backgroundColor: config.dotColor }]} />
-      <Text style={[styles.label, { color: config.textColor }]}>
+      <Text style={[styles.label, { color: config.textColor }, textStyle]}>
         {config.label}
       </Text>
     </View>
