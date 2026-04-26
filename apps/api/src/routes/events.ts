@@ -36,7 +36,6 @@ router.get("/:id", async (req: AuthRequest, res: Response) => {
   }
 });
 
-// POST /events — cria evento
 router.post("/", async (req: AuthRequest, res: Response) => {
   try {
     const {
@@ -48,6 +47,7 @@ router.post("/", async (req: AuthRequest, res: Response) => {
       categories,
       duration,
       progress,
+      status,
     } = req.body;
 
     if (!name || !type || !date || !hour) {
@@ -57,16 +57,32 @@ router.post("/", async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    const receipt = Array.isArray(categories)
+      ? categories.reduce(
+          (acc, cat) => acc + (cat.slots ?? 0) * (cat.price ?? 0),
+          0,
+        )
+      : 0;
+
+    const max_slots = Array.isArray(categories)
+      ? categories.reduce((acc, cat) => acc + (cat.slots ?? 0), 0)
+      : 0;
+
     const event = await Event.create({
       name,
       description,
       type,
       date,
       hour,
+      receipt,
       categories: categories ?? [],
       duration: duration ?? 0,
       progress: progress ?? 0,
       owner: req.user!.id,
+      status: status ?? "pending",
+      confirmed_players: 0,
+      payed_receipt: 0,
+      max_slots,
     });
 
     res.status(201).json({ data: event });
@@ -75,7 +91,6 @@ router.post("/", async (req: AuthRequest, res: Response) => {
   }
 });
 
-// PUT /events/:id — atualiza evento
 router.put("/:id", async (req: AuthRequest, res: Response) => {
   try {
     const event = await Event.findOneAndUpdate(
@@ -95,7 +110,6 @@ router.put("/:id", async (req: AuthRequest, res: Response) => {
   }
 });
 
-// DELETE /events/:id — deleta evento
 router.delete("/:id", async (req: AuthRequest, res: Response) => {
   try {
     const event = await Event.findOneAndDelete({

@@ -15,7 +15,7 @@ interface Props {
   eventos: Evento[];
   total: number;
   onEventoPress?: (evento: Evento) => void;
-  onMenuPress?: (evento: Evento) => void;
+  handleDelete?: (evento: Evento) => void;
 }
 
 const GAP = 16;
@@ -29,7 +29,7 @@ export function EventoGrid({
   eventos,
   total,
   onEventoPress,
-  onMenuPress,
+  handleDelete,
 }: Props) {
   const { width } = useWindowDimensions();
   const [layout, setLayout] = useState<Layout>("grid");
@@ -83,7 +83,7 @@ export function EventoGrid({
               <EventoCard
                 evento={evento}
                 onPress={() => onEventoPress?.(evento)}
-                onMenuPress={() => onMenuPress?.(evento)}
+                handleDelete={() => handleDelete?.(evento)}
               />
             </View>
           ))}
@@ -95,7 +95,7 @@ export function EventoGrid({
               <EventoCard
                 evento={evento}
                 onPress={() => onEventoPress?.(evento)}
-                onMenuPress={() => onMenuPress?.(evento)}
+                handleDelete={() => handleDelete?.(evento)}
               />
             </View>
           ))}

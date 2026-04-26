@@ -16,6 +16,7 @@ import { api } from "../../../services/api";
 import { Evento } from "../../../constants/types";
 import Loader from "../../components/loader";
 import { router } from "expo-router";
+import { ConfirmModal } from "../../components/utils/confirmModal";
 
 const FILTROS: Filtro[] = [
   { id: "beach-tenis", label: "Beach Tennis", icone: "🎾" },
@@ -34,6 +35,9 @@ export default function EventosPage() {
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [eventoParaDeletar, setEventoParaDeletar] = useState<Evento | null>(
+    null,
+  );
 
   const fetchEventos = useCallback(async () => {
     if (!token) return;
@@ -74,6 +78,13 @@ export default function EventosPage() {
     fetchEventos();
   }
 
+  async function handleDeleteEvento() {
+    if (!eventoParaDeletar) return;
+    await api.events.remove(token, eventoParaDeletar._id);
+    setEventoParaDeletar(null);
+    fetchEventos();
+  }
+
   function renderGrid() {
     if (isLoading) {
       return (
@@ -106,8 +117,24 @@ export default function EventosPage() {
       <EventoGrid
         eventos={eventosFiltrados}
         total={eventosFiltrados.length}
-        onEventoPress={(e) => router.push(`/events/${e._id}`)}
-        onMenuPress={(e) => console.log("menu evento", e._id)}
+        onEventoPress={(e) =>
+          router.push({
+            pathname: `/events/${e._id}`,
+            params: {
+              name: e.name,
+              description: e.description,
+              type: e.type,
+              date: e.date,
+              hour: e.hour,
+              progress: e.progress,
+              duration: e.duration,
+              categories: e.categories,
+              owner: e.owner,
+              status: e.status,
+            },
+          })
+        }
+        handleDelete={(e) => setEventoParaDeletar(e)}
       />
     );
   }
@@ -148,6 +175,16 @@ export default function EventosPage() {
       </ScrollView>
 
       <CreateEventDrawer visible={drawerAberta} onClose={handleEventoCriado} />
+
+      <ConfirmModal
+        visible={!!eventoParaDeletar}
+        danger
+        title="Excluir evento?"
+        description={`"${eventoParaDeletar?.name}" será removido permanentemente. Essa ação não pode ser desfeita.`}
+        confirmLabel="Excluir"
+        onCancel={() => setEventoParaDeletar(null)}
+        onConfirm={handleDeleteEvento}
+      />
     </>
   );
 }

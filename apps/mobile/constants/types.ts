@@ -17,9 +17,14 @@ export type EventForm = {
   type: string;
   date: string;
   hour: string;
+  receipt: number;
+  payed_receipt: number;
+  confirmed_players: number;
+  max_slots: number;
   progress?: number;
   duration?: number;
   categories: Categoria[];
+  status?: "scheduled" | "pending" | "completed" | "cancelled";
 };
 
 export type Evento = EventForm & {

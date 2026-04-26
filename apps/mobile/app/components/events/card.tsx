@@ -1,19 +1,17 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import React, { useRef, useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Evento } from "../../../constants/types";
-import {
-  BLACK,
-  GRAY_400,
-  GRAY_600,
-  GREEN,
-  WHITE,
-} from "../../../constants/colors";
+import { BLACK, GRAY_600, GREEN, WHITE } from "../../../constants/colors";
 import BeachImage from "../../../constants/images";
+import { StatusBadge } from "../events/status-badge";
 import { Ellipsis } from "lucide-react-native";
+import { AnchorMenu } from "../utils/anchorMenu";
+import { router } from "expo-router";
 
 interface Props {
   evento: Evento;
   onPress?: () => void;
-  onMenuPress?: () => void;
+  handleDelete?: () => void;
 }
 
 const GRAY_100 = "#F5F5F5";
@@ -24,9 +22,20 @@ const MODALIDADE_LABEL: Record<string, string> = {
   "volei-de-areia": "Vôlei de Areia",
 };
 
-export function EventoCard({ evento, onPress, onMenuPress }: Props) {
+export function EventoCard({ evento, onPress, handleDelete }: Props) {
   const progresso = evento.progress ?? 0;
-  const label = MODALIDADE_LABEL[evento.type] ?? evento.type;
+  const modalidadeLabel = MODALIDADE_LABEL[evento.type] ?? evento.type;
+
+  const menuButtonRef = useRef<View>(null);
+  const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(
+    null,
+  );
+
+  const openMenu = () => {
+    menuButtonRef.current?.measure((_fx, _fy, width, height, px, py) => {
+      setMenuAnchor({ x: px + width, y: py + height });
+    });
+  };
 
   return (
     <TouchableOpacity
@@ -37,8 +46,9 @@ export function EventoCard({ evento, onPress, onMenuPress }: Props) {
       <View style={styles.imageContainer}>
         <BeachImage width="100%" height={140} />
         <TouchableOpacity
+          ref={menuButtonRef}
           style={styles.menuButton}
-          onPress={onMenuPress}
+          onPress={openMenu}
           activeOpacity={0.7}
         >
           <Ellipsis size={16} color={GRAY_600} />
@@ -51,8 +61,8 @@ export function EventoCard({ evento, onPress, onMenuPress }: Props) {
         </Text>
 
         <View style={styles.statusRow}>
-          <View style={styles.statusIcon} />
-          <Text style={styles.statusText}>{label}</Text>
+          <Text style={styles.modalidadeText}>{modalidadeLabel}</Text>
+          <StatusBadge status={evento.status} />
         </View>
 
         <View style={styles.progressTrack}>
@@ -64,6 +74,35 @@ export function EventoCard({ evento, onPress, onMenuPress }: Props) {
           />
         </View>
       </View>
+
+      {menuAnchor && (
+        <AnchorMenu
+          visible={!!menuAnchor}
+          onDismiss={() => setMenuAnchor(null)}
+          anchor={menuAnchor}
+          options={[
+            // {
+            //   label: "Editar",
+            //   onPress: () => router.push(`/events/${evento._id}`),
+            // },
+            {
+              label: "Cancelar evento",
+              onPress: () => console.log("cancelar"),
+            },
+            { isDivider: true, label: "", onPress: () => {} },
+            {
+              label: "Excluir evento",
+              icon: "trash-can",
+              onPress: () => {
+                if (handleDelete) {
+                  handleDelete();
+                }
+              },
+              labelStyle: { color: "red" },
+            },
+          ]}
+        />
+      )}
     </TouchableOpacity>
   );
 }
@@ -90,11 +129,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  menuDots: {
-    fontSize: 10,
-    color: GRAY_600,
-    letterSpacing: 1,
-  },
   content: {
     padding: 12,
     gap: 6,
@@ -108,17 +142,9 @@ const styles = StyleSheet.create({
   statusRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    justifyContent: "space-between",
   },
-  statusIcon: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: GRAY_100,
-    borderWidth: 1,
-    borderColor: GRAY_400,
-  },
-  statusText: {
+  modalidadeText: {
     fontSize: 12,
     color: GRAY_600,
   },

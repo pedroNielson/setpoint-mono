@@ -102,12 +102,19 @@ export function CreateEventDrawer({ visible, onClose }: Props) {
       alert("Preencha nome, data e hora");
       return;
     }
+    setForm((prev) => ({
+      ...prev,
+      categories: prev.categories.filter((c) => c.selected),
+    }));
     setStep("review");
   }
 
   async function handleCreateEvent() {
-    const novo = await api.events.create(token, form);
-    console.log("Resposta da API:", novo);
+    const payload = {
+      ...form,
+      categories: form.categories.filter((c) => c.selected),
+    };
+    const novo = await api.events.create(token, payload);
     onClose();
   }
 
