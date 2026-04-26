@@ -6,36 +6,28 @@ const ORANGE = "#F4622A";
 const GRAY_100 = "#F5F5F5";
 const GRAY_200 = "#EEEEEE";
 
-interface Props {
-  isPending: boolean;
-}
-
-export function FaturamentoPlaceholder({ isPending }: Props) {
+export function FaturamentoPlaceholder() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
         <Text style={styles.cardTitle}>Faturamento</Text>
       </View>
 
-      {isPending ? (
-        <View style={styles.emptyState}>
-          <View style={styles.iconCircle}>
-            <TrendingUp size={24} color={GRAY_600} />
-          </View>
-          <Text style={styles.emptyTitle}>Nenhum dado ainda</Text>
-          <Text style={styles.emptyDescription}>
-            Os dados de faturamento aparecerão aqui assim que o evento for
-            publicado e as inscrições começarem.
-          </Text>
-          <View style={styles.gridMock}>
-            {[...Array(4)].map((_, i) => (
-              <View key={i} style={[styles.gridBar, { height: 20 + i * 14 }]} />
-            ))}
-          </View>
+      <View style={styles.emptyState}>
+        <View style={styles.iconCircle}>
+          <TrendingUp size={24} color={GRAY_600} />
         </View>
-      ) : (
-        <View style={styles.chartSpace}>{/* Gráfico real virá aqui */}</View>
-      )}
+        <Text style={styles.emptyTitle}>Nenhum dado ainda</Text>
+        <Text style={styles.emptyDescription}>
+          Os dados de faturamento aparecerão aqui assim que o evento for
+          publicado e as inscrições começarem.
+        </Text>
+        <View style={styles.gridMock}>
+          {[...Array(4)].map((_, i) => (
+            <View key={i} style={[styles.gridBar, { height: 20 + i * 14 }]} />
+          ))}
+        </View>
+      </View>
     </View>
   );
 }

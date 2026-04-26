@@ -6,8 +6,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { BLACK, GRAY_600, WHITE } from "../../../../constants/colors";
-
-const ORANGE = "#F4622A";
+import { StatusBadge } from "../status-badge";
 
 const TABS = [
   { key: "performance", label: "Performance" },
@@ -19,45 +18,69 @@ const TABS = [
 interface Props {
   active: string;
   onChange: (tab: string) => void;
+  status: string | string[];
 }
 
-export function TabBar({ active, onChange }: Props) {
+export function TabBar({ active, onChange, status }: Props) {
   return (
     <View style={styles.wrapper}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.container}
-      >
-        {TABS.map((tab) => {
-          const isActive = active === tab.key;
-          return (
-            <TouchableOpacity
-              key={tab.key}
-              onPress={() => onChange(tab.key)}
-              style={styles.tab}
-              activeOpacity={0.7}
-            >
-              <View style={styles.tabInner}>
-                <Text
-                  style={[
-                    styles.label,
-                    isActive ? styles.labelActive : styles.labelInactive,
-                  ]}
-                >
-                  {tab.label}
-                </Text>
-                {tab.pro && (
-                  <View style={styles.proBadge}>
-                    <Text style={styles.proText}>PRO</Text>
-                  </View>
-                )}
-              </View>
-              {isActive && <View style={styles.indicator} />}
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+      <View style={styles.headerRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.container}
+          style={styles.tabsScroll}
+        >
+          {TABS.map((tab) => {
+            const isActive = active === tab.key;
+            return (
+              <TouchableOpacity
+                key={tab.key}
+                onPress={() => onChange(tab.key)}
+                style={styles.tab}
+                activeOpacity={0.7}
+              >
+                <View style={styles.tabInner}>
+                  <Text
+                    style={[
+                      styles.label,
+                      isActive ? styles.labelActive : styles.labelInactive,
+                    ]}
+                  >
+                    {tab.label}
+                  </Text>
+                  {tab.pro && (
+                    <View style={styles.proBadge}>
+                      <Text style={styles.proText}>PRO</Text>
+                    </View>
+                  )}
+                </View>
+                {isActive && <View style={styles.indicator} />}
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
+        <View style={styles.headerRight}>
+          <StatusBadge
+            status={Array.isArray(status) ? status[0] : status}
+            info={
+              "Informações pendentes de preenchimento. Complete os dados para publicar o evento e liberar as inscricoes."
+            }
+            style={{
+              alignSelf: "flex-end",
+              marginBottom: 4,
+              width: 100,
+              height: 30,
+              justifyContent: "center",
+            }}
+            textStyle={{
+              fontSize: 15,
+              fontWeight: "600",
+            }}
+          />
+        </View>
+      </View>
     </View>
   );
 }
@@ -68,10 +91,28 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#EEEEEE",
   },
-  container: {
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
+  },
+  tabsScroll: {
+    flex: 1,
+  },
+  container: {
     flexDirection: "row",
     gap: 4,
+  },
+  headerRight: {
+    flexShrink: 1,
+    alignItems: "flex-end",
+    marginLeft: 16,
+  },
+  headerRightText: {
+    fontSize: 12,
+    color: GRAY_600,
+    textAlign: "right",
   },
   tab: {
     paddingVertical: 12,

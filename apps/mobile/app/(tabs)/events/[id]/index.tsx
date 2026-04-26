@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,30 +14,42 @@ import { PerformanceTab } from "../../../components/events/detail/performanceTab
 import { EdicaoTab } from "../../../components/events/detail/editionTab";
 import { OrganizadorTab } from "../../../components/events/detail/organizationTab";
 import { TabBar } from "../../../components/events/detail/tabBar";
-import { StatusBadge } from "../../../components/events/status-badge";
+import { useAuthStore } from "../../../../services/useAuthStore";
+import { api } from "../../../../services/api";
+import { PerformanceTabSkeleton } from "../../../components/events/detail/skeleton/performanceSkeleton";
 
 const ORANGE = "#F4622A";
 
 type Tab = "performance" | "edicao" | "organizador" | "insights";
 
 export default function EventoDetailScreen() {
+  const { token } = useAuthStore();
   const router = useRouter();
-  const {
-    name,
-    _id,
-    description,
-    type,
-    date,
-    hour,
-    progress,
-    duration,
-    categories,
-    owner,
-    status,
-  } = useLocalSearchParams();
+  const { name, id, status } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState<Tab>("performance");
 
-  const evento = { id: _id, name, type, status, progress };
+  const paramEvent = { id, name, status };
+
+  const [evento, setEvento] = useState<Evento>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchEventos = useCallback(async () => {
+    if (!token) return;
+    setIsLoading(true);
+    try {
+      console.log("Buscando evento com id:", paramEvent.id);
+      const data = await api.events.getById(token, paramEvent.id as string);
+      setEvento(data);
+    } catch (err: any) {
+      console.error("Erro ao buscar evento:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchEventos();
+  }, [fetchEventos]);
 
   return (
     <View style={styles.screen}>
@@ -49,46 +61,34 @@ export default function EventoDetailScreen() {
         <View style={styles.headerCenter}>
           <Text style={styles.breadcrumb}>Eventos</Text>
           <Text style={styles.titulo} numberOfLines={1}>
-            {evento.name}
-          </Text>
-        </View>
-
-        <View style={styles.headerRight}>
-          <StatusBadge
-            status={
-              Array.isArray(evento.status) ? evento.status[0] : evento.status
-            }
-            style={{
-              alignSelf: "flex-end",
-              marginBottom: 4,
-              width: 100,
-              height: 30,
-              justifyContent: "center",
-            }}
-            textStyle={{
-              fontSize: 15,
-              fontWeight: "600",
-            }}
-          />
-          <Text style={styles.headerRightText} numberOfLines={2}>
-            Informacoes pendentes de preenchimento. Complete os dados para
-            publicar o evento e liberar as inscricoes.
+            {paramEvent.name}
           </Text>
         </View>
       </View>
-      <TabBar active={activeTab} onChange={(t) => setActiveTab(t as Tab)} />
+      <TabBar
+        active={activeTab}
+        onChange={(t) => setActiveTab(t as Tab)}
+        status={paramEvent.status}
+      />
+
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {activeTab === "performance" && <PerformanceTab evento={evento} />}
-        {activeTab === "edicao" && <EdicaoTab evento={evento} />}
-        {activeTab === "organizador" && <OrganizadorTab evento={evento} />}
-        {activeTab === "insights" && (
-          <View style={styles.proPlaceholder}>
-            <Text style={styles.proText}>Disponível no plano PRO</Text>
-          </View>
+        {isLoading ? (
+          <PerformanceTabSkeleton />
+        ) : (
+          <>
+            {activeTab === "performance" && <PerformanceTab evento={evento} />}
+            {activeTab === "edicao" && <EdicaoTab evento={evento} />}
+            {activeTab === "organizador" && <OrganizadorTab evento={evento} />}
+            {activeTab === "insights" && (
+              <View style={styles.proPlaceholder}>
+                <Text style={styles.proText}>Disponível no plano PRO</Text>
+              </View>
+            )}
+          </>
         )}
       </ScrollView>
     </View>

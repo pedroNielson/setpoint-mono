@@ -22,8 +22,6 @@ type Props = {
   form: EventForm;
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function formatModalidade(value: string): string {
   const map: Record<string, string> = {
     "beach-tenis": "Beach Tênis",
@@ -43,8 +41,6 @@ function groupByType(categories: Categoria[]) {
     }))
     .filter((g) => g.items.length > 0);
 }
-
-// ─── Sub-componentes ──────────────────────────────────────────────────────────
 
 function InfoRow({
   icon,
@@ -146,8 +142,6 @@ function CategoriasTable({ categories }: { categories: Categoria[] }) {
   );
 }
 
-// ─── Componente principal ─────────────────────────────────────────────────────
-
 const FormResult = ({ form }: Props) => {
   const categoriasCount = (form.categories ?? []).filter(
     (c) => c.selected,
@@ -205,8 +199,6 @@ const FormResult = ({ form }: Props) => {
     </ScrollView>
   );
 };
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   scroll: {

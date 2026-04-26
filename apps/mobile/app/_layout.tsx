@@ -3,6 +3,7 @@ import { View, ActivityIndicator } from "react-native";
 import { Stack } from "expo-router";
 import { useAuthStore } from "../services/useAuthStore";
 import { useFonts, FiraSans_700Bold } from "@expo-google-fonts/fira-sans";
+import { PaperProvider } from "react-native-paper";
 
 export default function RootLayout() {
   const token = useAuthStore((s) => s.token);
@@ -30,13 +31,15 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={!token}>
-        <Stack.Screen name="login" />
-      </Stack.Protected>
-      <Stack.Protected guard={!!token}>
-        <Stack.Screen name="(app)" />
-      </Stack.Protected>
-    </Stack>
+    <PaperProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Protected guard={!token}>
+          <Stack.Screen name="login" />
+        </Stack.Protected>
+        <Stack.Protected guard={!!token}>
+          <Stack.Screen name="(app)" />
+        </Stack.Protected>
+      </Stack>
+    </PaperProvider>
   );
 }
